@@ -1,6 +1,10 @@
-# Sqisign: Light post-quantum signatures from quaternions and isogenies
+# SQI-sign: Light post-quantum signatures from quaternions and isogenies
 
-This code implements the isogeny-based signature scheme Sqisign.
+This code implements the isogeny-based signature scheme SQI-sign.
+
+No pull requests.
+
+(C) 2020. The SQI-sign team, all rights reserved.
 
 ## Dependencies
 
@@ -80,3 +84,15 @@ you want benchmarks for the GMP version, run
 ```
 make benchmark_gmp
 ```
+
+### Timings
+
+The following are timings (medians) obtained running the benchmarks
+above on a Intel Core i7-8650U CPU @ 1.90GHz with Turbo Boost
+disabled.
+
+|        |     cycles |       ms |
+|:-------|-----------:|---------:|
+| keygen | 2137798122 |  986.999 |
+| sign   | 8271887450 | 3891.709 |
+| verify |   54975173 |   25.994 | 

@@ -88,11 +88,11 @@ make benchmark_gmp
 ### Timings
 
 The following are timings (medians) obtained running the benchmarks
-above on a Intel Core i7-8650U CPU @ 1.90GHz with Turbo Boost
+above on an Intel Core i7-6700 CPU @ 3.40GHz with Turbo Boost
 disabled.
 
-|        |     cycles |       ms |
-|:-------|-----------:|---------:|
-| keygen | 2137798122 |  986.999 |
-| sign   | 8271887450 | 3891.709 |
-| verify |   54975173 |   25.994 | 
+|        | Mcycles |    ms |
+|:-------|--------:|------:|
+| keygen |   1,959 |   575 |
+| sign   |   7,767 | 2,279 |
+| verify |     142 |    42 |

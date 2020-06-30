@@ -95,16 +95,6 @@ GEN norm0(GEN x) {
     return algnorm(global_setup.B, x,0);
 }
 
-/*
-static GEN alg_O0_to_standard(GEN elt) {
-    return RgM_RgC_mul(global_setup.O0_to_standard, elt);
-}
-
-static GEN alg_standard_to_O0(GEN elt) {
-    return RgM_RgC_mul(global_setup.standard_to_O0, elt);
-}
-*/
-
 void fp2_random_replayable(fp2 *x) {
   uint64_t thrash;
   x->re.x.c[0] = random_Fl(0xffffffffffffffff);
@@ -297,11 +287,6 @@ bool bidim_log_2e(long long *a, long long *b, const proj *A, const proj *Q, cons
                 else {
                     log_1 += tmp;
                     log_2 += tmp;
-
-                    // //test
-                    // uintbig_add3(&x, &x, &tmp_big);
-                    // xBIDIM(&R, A, &Ps1[e-i-1], &x, &Ps2[e-i-1], &y, &Ps12[e-i-1]);
-                    // assert(mont_equal(&Qs[e-i-1], &R));
                 }
             }
                 
@@ -378,16 +363,6 @@ void montxy0_frob(proj2 *Q, const proj2 *P) {
     fp2_frob2(&Q->z, &Pcopy.z);
 }
 
-// void ted0_frobdist(point *Q, const point *P) {
-//     ted0_dist(Q, P);
-//     ted0_frob(Q, Q);
-// }
-
-// void mont0_frobdist(proj *Q, const proj *P) {
-//     mont0_dist(Q, P);
-//     mont0_frob(Q, Q);
-// }
-
 
 void compute_action(GEN *M, void (*endo)(point*, const point*), const point *P1, const point *P2, const proj *E, long ell, long e) {
     point Q;
@@ -436,10 +411,6 @@ void compute_action_2e(GEN *M, void (*endo)(proj*, const proj*), const proj *P1,
     xBIDIM(&R, A, P1, &biga, P2, &bigc, P12);
     assert(mont_equal(&Q, &R));
 
-    // printf("a := %lld; b := %lld;\n", a, b);
-    // printf("c := %lld; d := %lld;\n", c, d);
-    // printf("x := %lld; y := %lld;\n", x, y);
-
     if (((x != (a+b)%(1LL<<e)) && ((1LL<<e)-x != (a+b)%(1LL<<e))) || ((y != (c+d)%(1LL<<e)) && ((1LL<<e)-y != (c+d)%(1LL<<e)))) {
         b = (1LL<<e)-b;
         d = (1LL<<e)-d;
@@ -481,33 +452,6 @@ GEN action_two_3_4(GEN m_i, GEN m_j, long e) {
 
                     if (gequal(iMi,test1) && gequal(MM,test2)) { // a candidate
                         m_1ji2 = gmod(gneg(gmul(m_ij2,m_i)),gelle);
-
-
-                    // printf("i+j\n");
-                    // output(gmod(gadd(m_i, m_j),gelle));
-                    // output(gmod(gmul(m_ij2,gen_2),gelle));
-                    // //output(gmod(m_ij2,gelle));
-                    // printf("1-ji\n");
-                    // output(gmod(gadd(id, gneg(gmul(m_j,m_i))),gelle));
-                    // output(gmod(gmul(m_1ji2,gen_2),gelle));
-                    // //output(gmod(m_1ji2,gelle));
-
-                        // printf("m_j\n");
-                        // output(m_j);
-                        // GEN m_j_alt = gmod(gsub(gmul(m_ij2,gen_2), m_i),gelle);
-                        // printf("m_i\n");
-                        // output(m_i);
-                        // printf("m_ij2\n");
-                        // output(m_ij2);
-                        // printf("m_j_alt\n");
-                        // output(m_j_alt);
-
-
-                        // GEN m_ji = gmod(gsub(id, gmul(m_1ji2,gen_2)),gelle);
-                        // printf("m_ji?\n");
-                        // output(m_ji);
-                        // output(gmod(gmul(m_j,m_i),gelle));
-                        // m_ji = gmod(gadd(gmul(m_ij2,gmul(gen_2,m_i)), id),gelle);
 
 
 
@@ -582,16 +526,9 @@ void check_action(GEN M, void (*endo)(point*, const point*), void (*mont_endo)(p
 bool check_action_2e(GEN M, void (*endo)(proj*, const proj*), void (*endoxy)(proj2*, const proj2*), const proj2 *P1xy, const proj2 *P2xy, const proj *E, long e) {
     long long x,y;
     uintbig X,Y,U,V;
-    // proj Q,e1,e2,e12,eQ_combination,eQ;
     proj2 Qxy,Rxy,exy1,exy2,exy12,eQxy_combination,eQxy;
 
     proj2 P12xy;
-    // proj P1, P2, P12;
-
-    // xytox(&P1,P1xy);
-    // xytox(&P2,P2xy);
-    // xyADD(&P12xy, E, P1xy, P2xy);
-    // xytox(&P12,&P12xy);
 
     GEN t;
 
@@ -600,25 +537,6 @@ bool check_action_2e(GEN M, void (*endo)(proj*, const proj*), void (*endoxy)(pro
         y = random_Fl(1ULL<<e);
         uintbig_set(&X, x);
         uintbig_set(&Y, y);
-
-        // endo(&e1,&P1);
-        // endo(&e2,&P2);
-        // endo(&e12,&P12);
-
-        // xBIDIM(&Q, E, &P1, &X, &P2, &Y, &P12);
-
-        // endo(&eQ,&Q);
-
-        // t = gmod(RgM_RgC_mul(M, mkcol2s(x,y)), stoi(1ULL<<e));
-        // uintbig_set(&U, itos_or_0(gel(t,1)));
-        // uintbig_set(&V, itos_or_0(gel(t,2)));
-
-        // xBIDIM(&eQ_combination, E, &P1, &U, &P2, &V, &P12);
-
-        // assert(mont_equal(&eQ,&eQ_combination));
-
-
-
 
 
         endoxy(&exy1,P1xy);
@@ -893,20 +811,6 @@ int main(int argc, char *argv[]){
     ted_to_mont_point(&basis_twist_sum[2], &basis_twist_ted_sum[2]);
 
 
-
-
-    // printf("const proj basis[%lu][3] = {\n", p_plus_len);
-    // for (int i = 0; i < p_plus_len; i++) {
-    //     printf("{%s,\n %s,\n %s }%s\n", proj_code(&basis[i][0]), proj_code(&basis[i][1]), proj_code(&basis[i][2]), (i == p_plus_len-1) ? " };" : ",");
-    // }
-    // printf("const proj basis_twist[%lu][3] = {\n", p_minus_len);
-    // for (int i = 0; i < p_minus_len; i++) {
-    //     printf("{%s,\n %s,\n %s }%s\n", proj_code(&basis_twist[i][0]), proj_code(&basis_twist[i][1]), proj_code(&basis_twist[i][2]), (i == p_minus_len-1) ? " };" : ",");
-    // }
-
-    // printf("\n");
-
-
     printf("const proj torsion_basis_sum[3] = \n");
     printf("{%s,\n %s,\n %s };\n", proj_code(&basis_sum[0]), proj_code(&basis_sum[1]), proj_code(&basis_sum[2]));
 
@@ -974,17 +878,15 @@ int main(int argc, char *argv[]){
     compute_action_2e(&m_dist, mont0_dist, &basis_two[0], &basis_two[1], &basis_two[2], &global_setup.E0, two_tors_height);
     do {
         correct_sign = check_action_2e(m_dist, mont0_dist, montxy0_dist, &basisxy_two[0], &basisxy_two[1], &global_setup.E0, two_tors_height);
-        if (!correct_sign) { printf("error in dist\n"); m_dist = gmod(gneg(m_dist), powuu(2,two_tors_height));}
+        if (!correct_sign) { m_dist = gmod(gneg(m_dist), powuu(2,two_tors_height));}
     } while (!correct_sign);
 
     compute_action_2e(&m_frob, mont0_frob, &basis_two[0], &basis_two[1], &basis_two[2], &global_setup.E0, two_tors_height);
     do {
         correct_sign = check_action_2e(m_frob, mont0_frob, montxy0_frob, &basisxy_two[0], &basisxy_two[1], &global_setup.E0, two_tors_height);
-        if (!correct_sign) { printf("error in frob\n");  m_frob = gmod(gneg(m_frob), powuu(2,two_tors_height));}
+        if (!correct_sign) { m_frob = gmod(gneg(m_frob), powuu(2,two_tors_height));}
     } while (!correct_sign);
-    //action_two_3 = gsub(m1,gmul(m_frob,m_dist)); // (1-ji)
-    //action_two_3 = half_action_two();
-    //action_two_4 = gadd(m_dist,m_frob); //(i+j)
+
     printf("\tglobal_setup.action_two_2 = %s;\n", pari_2x2_matrix_code(m_dist));
     action_two_3_4(m_dist, m_frob, two_tors_height);
 

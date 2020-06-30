@@ -8,7 +8,13 @@ extern const long two_tors_height;
 // The cofactor of 2^two_tors_height in p±1
 extern const uintbig p_even_cofactor;
 extern const long security_level;
+
+// the signing isogeny has degree 2^signing_length
 extern const long signing_length;
+// we have the equality signin_length = two_tors_height * (signing_length_two_tors_height_step -1 ) + last_step_length
+extern const long signing_length_two_tors_height_step;
+extern const long last_step_length;
+
 
 // The useful odd factors in p-1
 extern const long p_minus_len;

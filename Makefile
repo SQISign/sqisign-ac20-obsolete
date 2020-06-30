@@ -31,10 +31,12 @@ BENCHS=$(patsubst bench/%.c,build/bench_%,$(wildcard bench/*.c))
 
 $(BENCHS): build/bench_%: bench/%.c $(SRC:%=src/%) $(SRC_ASM:%=src/%)\
 $(SRC6983:%=src/p6983/%) $(SRC6983_ASM:%=src/p6983/%)
+	@mkdir -p $(@D)
 	$(CC) $^ $(CFLAGS) $(BENCH_FLAGS) $(CFLAGSLINK) -o $@
 
 $(BENCHS_GMP): build/bench_%_gmp: bench/%.c $(SRC:%=src/%) $(SRC_GMP:%=src/%)\
 $(SRC6983:%=src/p6983/%) $(SRC6983_GMP:%=src/p6983/%)
+	@mkdir -p $(@D)
 	$(CC) $^ $(CFLAGS) $(BENCH_FLAGS) $(CFLAGSLINK) -lgmp -o $@
 
 # Tests
@@ -57,16 +59,15 @@ build/precomp: src/precomp.c $(LIB_GMP)
 
 build/tunecycles_6983: src/tunecycles.c src/isogenies.c src/mont.c src/p6983/fp2.c src/uint.s\
 src/p6983/fp.s src/p6983/constants.c src/rng.c src/poly.c src/steps.c src/steps_default.c
+	@mkdir -p $(@D)
 	$(CC) $^ $(CFLAGS) $(BENCH_FLAGS) $(CFLAGSLINK) -o $@
 
 src/p6983/tunecycles.out: build/tunecycles_6983
 	# 8 minutes on 1.9GHz Kaby Lake
 	time ./$< > $@
 
-src/p6983/steps_tunecycles.c: src/p6983/tunecycles.out src/tune2c
-	./src/tune2c < $< > $@
-
-tune: src/p6983/steps_tunecycles.c
+tune: src/tune2c src/p6983/tunecycles.out
+	./src/tune2c < src/p6983/tunecycles.out > src/p6983/steps_tunecycles.c
 
 # Object files
 $(OBJ6983) $(OBJ): build/obj/%.o: src/%.c

@@ -46,20 +46,18 @@ int main(int argc, char *argv[]){
       // sk.I_T = gcopy(sk.I_T);
       compressed_signature comp_sigma;
       init_compressed_sig(&comp_sigma);
-      signature Sigma;
-      //this parameters are only correct when the size of the signing isogeny is 1000
-      long last_step=10;
-      long len=31;
+      // signature Sigma;
 
-      sign(&Sigma,&comp_sigma ,&sk, &pk, &m);
-      assert(mont_equal(&Sigma.sigma.phi[0].A,&pk.E));
 
-      assert(verif(&comp_sigma,&pk,&m,len,last_step));
+      sign(&comp_sigma ,&sk, &pk, &m);
+
+      assert(verif(&comp_sigma,&pk,&m));
 
       randombytes(m.c, 32);
-      assert(!verif(&comp_sigma,&pk,&m,len,last_step));
+      assert(!verif(&comp_sigma,&pk,&m));
+      free_compressed_sig(&comp_sigma);
     }
-    
+
     printf("    \033[1;32mAll tests passed\033[0m\n");
     exit(0);
 

@@ -58,20 +58,22 @@ int main(int argc, char **argv) {
     for (int s = 0; s < sigs; s++) {
       uintbig m;
       randombytes(m.c, 32);
-      signature Sigma;
+      // signature Sigma;
       compressed_signature comp_sigma;
-      
-      sign(&Sigma, &comp_sigma, &sk, &pk, &m);      
-    
+      init_compressed_sig(&comp_sigma);
+      sign( &comp_sigma, &sk, &pk, &m);
+
       for (int i = 0; i < samples; i++) {
 	clock_t t = -clock();
 	uint64_t c = -rdtsc();
-	verif(&comp_sigma, &pk, &m, 10, 31);
+  verif(&comp_sigma, &pk, &m);
+
 	c += rdtsc();
 	t += clock();
 
 	printf("%d\t%d\t%" PRIu64 "\t%.3lf\n", k, s, c, 1000. * t / CLOCKS_PER_SEC);
       }
+      free_compressed_sig(&comp_sigma);
     }
   }
 

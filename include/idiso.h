@@ -66,6 +66,7 @@ void two_walk_stol(two_walk_long *phil, const two_walk *phi);
 // Evaluate special isogeny phi : A -> ?? at point P.
 // sets P to the image point
 void init_trivial_two_walk_long(two_walk_long *phi);
+void free_two_walk_long(two_walk_long *phi);
 void copy_two_walk_long(two_walk_long *copy, const two_walk_long *phi);
 proj eval_special(proj *A, special_isogeny *phi, const proj *P);
 void two_walk_composition_ls(two_walk_long *phi, const two_walk_long *phi2, const two_walk *phi1);
@@ -104,7 +105,3 @@ void ideal_to_isogeny_two(two_walk_long *phi_res, GEN *L, special_isogeny *phi_L
 void ideal_to_isogeny_O0_two_long(two_walk_long *phi, GEN *L, special_isogeny *phi_L, GEN I, bool endpoint_close_to_E0);
 
 #endif
-
-
-
-

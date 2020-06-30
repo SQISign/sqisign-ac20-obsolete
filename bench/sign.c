@@ -8,6 +8,7 @@
 
 #include "precomputed.h"
 #include "sqisign.h"
+#include "constants.h"
 
 static __inline__ uint64_t rdtsc(void)
 {
@@ -53,22 +54,23 @@ int main(int argc, char **argv) {
     keygen(&pk, &sk);
 
     for (int i = 0; i < samples; i++) {
-      signature Sigma;
+      // signature Sigma;
       compressed_signature comp_sigma;
+      init_compressed_sig(&comp_sigma);
       uintbig m;
       randombytes(m.c, 32);
 
       clock_t t = -clock();
       uint64_t c = -rdtsc();
-      sign(&Sigma,&comp_sigma ,&sk, &pk, &m);
+      sign(&comp_sigma ,&sk, &pk, &m);
       c += rdtsc();
       t += clock();
+      free_compressed_sig(&comp_sigma);
+  //     int len = 0;
+  //     for (int j = 0; j < Sigma.sigma.len; j++)
+	// len += Sigma.sigma.phi[j].len;
 
-      int len = 0;
-      for (int j = 0; j < Sigma.sigma.len; j++)
-	len += Sigma.sigma.phi[j].len;
-
-      printf("%d\t%" PRIu64 "\t%.3lf\t%d\n", k, c, 1000. * t / CLOCKS_PER_SEC, len);
+      printf("%d\t%" PRIu64 "\t%.3lf\t%ld\n", k, c, 1000. * t / CLOCKS_PER_SEC, signing_length);
     }
   }
 

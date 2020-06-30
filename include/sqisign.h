@@ -29,12 +29,13 @@ typedef struct compressed_signature {
 
 
 void init_compressed_sig(compressed_signature *comp_sigma);
+void free_compressed_sig(compressed_signature *comp_sigma);
 void keygen(public_key *pk, secret_key *sk);
 void commitment(GEN *coeff, GEN *I, odd_isogeny *phi_com);
 void challenge(proj *E_cha, const uintbig *m, const proj *E_com, const proj *basis_plus, const proj *basis_minus, GEN *dlog, proj *basis_two);
 void response(two_walk_long *sigma, uint64_t *zip, GEN coeff_ker_challenge_commitment, const secret_key *sk, const proj *basis_two, const proj *E_cha);
-void sign(signature *Sigma,compressed_signature *comp_sigma, const secret_key *sk, const public_key *pk, const uintbig *m);
+void sign(compressed_signature *comp_sigma, const secret_key *sk, const public_key *pk, const uintbig *m);
 void decompress(two_walk *walk, proj *A, const uint64_t *zip, long len,long last_step);
-bool verif(compressed_signature *comp_sigma, const public_key *pk,const uintbig *m, const long len, const long last_step);
+bool verif(compressed_signature *comp_sigma, const public_key *pk,const uintbig *m);
 
 #endif

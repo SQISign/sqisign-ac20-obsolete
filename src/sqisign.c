@@ -22,7 +22,11 @@
 
 
 void init_compressed_sig(compressed_signature *comp_sigma) {
-  comp_sigma->zip =NULL;
+  comp_sigma->zip=malloc(sizeof(uint64_t)*signing_length_two_tors_height_step);
+}
+
+void free_compressed_sig(compressed_signature *comp_sigma) {
+  free(comp_sigma->zip);
 }
 
 void keygen(public_key *pk, secret_key *sk) {
@@ -1000,18 +1004,19 @@ bool simple_check_signature(const two_walk_long *sigma, const uint64_t *zip, con
     return (mont_equal(&j1, &j2) && mont_equal(&j1,&j3));
 }
 
-void zip_copy(compressed_signature *comp_sigma,uint64_t *zip, long len) {
-  compressed_signature res;
-  res.E_com=comp_sigma->E_com;
-  res.zip=malloc(sizeof(uint64_t)*len);
-  for (int i=0;i <len;i++){
-    res.zip[i]=zip[i];
-  }
-  free(comp_sigma->zip);
-  // comp_sigma->E_com = { fp2_0, fp2_1 };
-  *comp_sigma= res;
-}
-void sign(signature *Sigma,compressed_signature *comp_sigma, const secret_key *sk, const public_key *pk, const uintbig *m) {
+// void zip_copy(compressed_signature *comp_sigma,uint64_t *zip, long len) {
+//   compressed_signature res;
+//   res.E_com=comp_sigma->E_com;
+//   res.zip=malloc(sizeof(uint64_t)*len);
+//   for (int i=0;i <len;i++){
+//     res.zip[i]=zip[i];
+//   }
+//   free(comp_sigma->zip);
+//   // comp_sigma->E_com = { fp2_0, fp2_1 };
+//   *comp_sigma= res;
+
+
+void sign(compressed_signature *comp_sigma, const secret_key *sk, const public_key *pk, const uintbig *m) {
     pari_sp ltop = avma;
 
     GEN coeff_com, I_com;
@@ -1022,7 +1027,7 @@ void sign(signature *Sigma,compressed_signature *comp_sigma, const secret_key *s
 
     commitment(&coeff_com, &I_com, &phi_com);
 
-    Sigma->E_com = global_setup.E0;
+    comp_sigma->E_com = global_setup.E0;
 
 
     // compute the image of a basis of the torsion used for the challenge
@@ -1038,7 +1043,7 @@ void sign(signature *Sigma,compressed_signature *comp_sigma, const secret_key *s
     points[7] = torsion_basis_two[1];
     points[8] = torsion_basis_two[2];
 
-    eval_mult(&Sigma->E_com, &phi_com, points, 9);
+    eval_mult(&comp_sigma->E_com, &phi_com, points, 9);
 
     proj basis_plus[3], basis_minus[3], basis_two[3];
     basis_plus[0] = points[0];
@@ -1056,7 +1061,7 @@ void sign(signature *Sigma,compressed_signature *comp_sigma, const secret_key *s
         uintbig_set(&ell_big, p_plus_fact[i]);
         for (int j = 0; j < p_plus_mult[i] - p_plus_mult_cha[i]; ++j){
             for (int l = 0; l < 3; ++l) {
-                xMUL(&basis_plus[l], &Sigma->E_com, &basis_plus[l], &ell_big);
+                xMUL(&basis_plus[l], &comp_sigma->E_com, &basis_plus[l], &ell_big);
             }
         }
     }
@@ -1065,18 +1070,18 @@ void sign(signature *Sigma,compressed_signature *comp_sigma, const secret_key *s
         uintbig_set(&ell_big, p_minus_fact[i]);
         for (int j = 0; j < p_minus_mult[i] - p_minus_mult_cha[i]; ++j){
             for (int l = 0; l < 3; ++l) {
-                xMUL(&basis_minus[l], &Sigma->E_com, &basis_minus[l], &ell_big);
+                xMUL(&basis_minus[l], &comp_sigma->E_com, &basis_minus[l], &ell_big);
             }
         }
     }
 
     //printf("Challenge\n");
 
-    comp_sigma->E_com= Sigma->E_com;
+    // comp_sigma->E_com= Sigma->E_com;
 
     GEN dlog;
 
-    challenge(&E_cha, m, &Sigma->E_com, basis_plus, basis_minus, &dlog, basis_two);
+    challenge(&E_cha, m, &comp_sigma->E_com, basis_plus, basis_minus, &dlog, basis_two);
 
     GEN coeff_ker_challenge_commitment = gadd(coeff_com,dlog);
 
@@ -1103,25 +1108,24 @@ void sign(signature *Sigma,compressed_signature *comp_sigma, const secret_key *s
     #endif
 
 
-
-    //printf("Response\n");
-    //this 31 is only correct when the desired length is 1000
-    uint64_t zip[31];
+    uint64_t zip[signing_length_two_tors_height_step];
     two_walk_long sigma;
     init_trivial_two_walk_long(&sigma);
 
-    response(&sigma, zip, coeff_ker_challenge_commitment, sk, basis_two, &E_cha);
+    response(&sigma, comp_sigma->zip, coeff_ker_challenge_commitment, sk, basis_two, &E_cha);
 
-    Sigma->sigma = sigma;
-    zip_copy(comp_sigma,zip,31);
-    // for (int i=0;i<31 ;i ++ ){
+    // Sigma->sigma = sigma;
+    // zip_copy(comp_sigma,zip,signing_length_two_tors_height_step);
+
+
+    // for (int i=0;i<signing_length_two_tors_height_step ;i ++ ){
     //     comp_sigma->zip[i]=zip[i];
     // }
 
 
-    assert(simple_check_signature(&sigma,zip, pk, &E_cha));
+    assert(simple_check_signature(&sigma,comp_sigma->zip, pk, &E_cha));
 
-
+    free_two_walk_long(&sigma);
 
     avma = ltop;
 }
@@ -1130,17 +1134,17 @@ void sign(signature *Sigma,compressed_signature *comp_sigma, const secret_key *s
 
 
 
-bool verif(compressed_signature *comp_sigma, const public_key *pk,const uintbig *m, const long len ,const long last_step){
+bool verif(compressed_signature *comp_sigma, const public_key *pk,const uintbig *m){
     proj A_chall = comp_sigma->E_com;
     challenge(&A_chall, m, &A_chall, NULL, NULL, NULL, NULL);
     proj A_check=pk->E;
-    two_walk walk_check[len];
+    two_walk walk_check[signing_length_two_tors_height_step];
     // for (int i=0;i< 30;i++){
     //   printf("%ld ",comp_sigma->zip[i]);
     // }
     // printf("\n");
 
-    decompress(walk_check,&A_check,comp_sigma->zip,len,last_step);
+    decompress(walk_check,&A_check,comp_sigma->zip,signing_length_two_tors_height_step,last_step_length);
 
     proj j1,j2;
     jinv256(&j1,&A_chall);

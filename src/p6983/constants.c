@@ -12,6 +12,9 @@ const long security_level = 128;
 
 const long signing_length=1000 ;
 
+const long signing_length_two_tors_height_step = 31;
+const long last_step_length = 10;
+
 const uintbig p_plus_odd_cofactor = { 0x68cd740600000000, 0x0016c5bcbd22f015, 0, 0 };
 const uintbig p_minus_odd_cofactor = { 2, 0, 0, 0 };
 const uintbig p_even_cofactor = { 0xa52ca964a8652149, 0x1bb9479de8d8027c,

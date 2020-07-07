@@ -1,10 +1,10 @@
-# SQI-sign: Light post-quantum signatures from quaternions and isogenies
+# SQISign: Light post-quantum signatures from quaternions and isogenies
 
-This code implements the isogeny-based signature scheme SQI-sign.
+This code implements the isogeny-based signature scheme SQISign.
 
 No pull requests.
 
-(C) 2020. The SQI-sign team, all rights reserved.
+(C) 2020. The SQISign team, all rights reserved.
 
 ## Dependencies
 

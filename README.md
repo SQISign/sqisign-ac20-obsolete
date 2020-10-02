@@ -2,9 +2,7 @@
 
 This code implements the isogeny-based signature scheme SQISign.
 
-No pull requests.
-
-(C) 2020. The SQISign team, all rights reserved.
+(C) 2020, The SQISign team. MIT license.
 
 ## Dependencies
 

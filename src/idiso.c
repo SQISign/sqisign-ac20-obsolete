@@ -17,51 +17,6 @@
 
 
 
-
-#ifndef NDEBUG
-// static isog_degree mont_order(const proj *P, const proj *A, const long *fact, const long *mult, long len) {
-//   proj tmp;
-//   uintbig cof;
-//   isog_degree deg = degree_co((isog_degree){ 0 }, mult, len);
-//   for (int j = 0; j < len; j++) {
-//     degree_unset(&deg, j);
-//     degree_to_uint(&cof, deg, fact, len);
-//     xMUL(&tmp, A, P, &cof);
-//     uintbig_set(&cof, fact[j]);
-//     uint8_t v = 0;
-//     for ( ; !mont_iszero(&tmp); v++) {
-//       xMUL(&tmp, A, &tmp, &cof);
-//     }
-//     degree_set(&deg, j, v);
-//   }
-//   return deg;
-// }
-// static char* fp2_hash(fp2 x) {
-//     return pari_sprintf("h%lu", (x.re.x.c[0]+3*x.re.x.c[1]+5*x.re.x.c[2]+7*x.re.x.c[3]
-//                     +11*x.im.x.c[0]+13*x.im.x.c[1]+17*x.im.x.c[2]+23*x.im.x.c[3]) % 100003);
-// }
-// static fp2 fp2_ratio(fp2 *x, fp2 *y) {
-//     fp2 tmp;
-//     tmp = *y;
-//     assert(!fp2_iszero(&tmp));
-//     fp2_inv(&tmp);
-//     fp2_mul2(&tmp, x);
-//     //printf("%lld %lld %lld %lld\n", tmp.re.x.c[0], tmp.re.x.c[1], tmp.im.x.c[0], tmp.im.x.c[1]);
-//     return tmp;
-// }
-// static char* proj_hash(proj x) {
-//     if (fp2_iszero(&x.z)) return "infty";
-//     return fp2_hash(fp2_ratio(&x.x,&x.z));
-// }
-// // distorsion map on E0, montgomery form
-// static void mont0_dist(proj *Q, const proj *P) {
-//     proj Pcopy = *P;
-//     fp2_neg2(&Q->x, &Pcopy.x);
-//     Q->z = Pcopy.z;
-// }
-#endif
-
-
 odd_isogeny trivial_odd_isogeny() {
     odd_isogeny phi;
 
@@ -634,7 +589,6 @@ void two_walk_composition_ss(two_walk_long *phi, const two_walk *phi2, const two
     free_two_walk_long(&phi2l);
 }
 
-// tested
 odd_isogeny push_odd_isogeny_through_two_walk(const odd_isogeny *phi_odd, proj *phi_odd_source, const two_walk *phi_two) {
     odd_isogeny phi_odd_isom = *phi_odd;
 
@@ -695,7 +649,6 @@ odd_isogeny push_odd_isogeny_through_two_walk(const odd_isogeny *phi_odd, proj *
     return res;
 }
 
-// tested
 odd_isogeny push_odd_isogeny_through_two_walk_long(const odd_isogeny *phi_odd, proj *phi_odd_source, const two_walk_long *phi_two) {
     odd_isogeny res = *phi_odd;
     for (int i = 0; i < phi_two->len; ++i) {
@@ -704,14 +657,12 @@ odd_isogeny push_odd_isogeny_through_two_walk_long(const odd_isogeny *phi_odd, p
     return res;
 }
 
-// tested
 two_walk push_two_walk_through_odd_isogeny(const two_walk *phi_two, const odd_isogeny *phi_odd, const proj *phi_odd_source) {
     two_walk res = *phi_two;
     isomorphism isom;
 
     mont_isom(&isom, &phi_two->A, phi_odd_source);
     mont_isom_apply(&isom, &res.ker);
-    //printf("isom %s %s %s\n", fp2_hash(isom.Nx), fp2_hash(isom.Nz), fp2_hash(isom.D));
 
     res.A = *phi_odd_source;
 
@@ -819,8 +770,6 @@ GEN dual_coeff(GEN coeff, isog_degree deg_plus, isog_degree deg_minus) {
         long e = p_plus_mult[i];
         GEN c1 = gel(gel(gel(coeff,1), 1), i+1);
         GEN c2 = gel(gel(gel(coeff,1), 2), i+1);
-        // printf("coeff %ld^%ld\n", ell, e);
-        // output(mkvec2(c1,c2));
         long d = degree_get(deg_plus, i);
         if (Z_lval(c1, ell) == e-d) {
             gel(gel(gel(coeff_dual,1), 1), i+1) = gen_0;
@@ -929,15 +878,13 @@ void ideal_to_isogeny_two_2f_delta(two_walk_long *phi, GEN *L,
     alg_primitive(&n, A, order, gamma);
     assert(gcmp(n,gen_1) == 0);
 
-    // GEN H1_two = lideal_create(A, order, gamma, gmul(lideal_norm(K),powuu(2, e1)));
 
 
     GEN H1_odd = lideal_create(A, order, gamma, ggcd(global_setup.gen_odd_torsion, lideal_norm(L_)));
 
 
 
-    odd_isogeny psi_1; //= ideal_to_isogeny_O0_T(H1_odd, famat_Z_gcd(famat_mul(global_setup.gen_p_plus_fact, global_setup.gen_p_minus_fact),lideal_norm(H1_odd)));
-
+    odd_isogeny psi_1; 
 
     GEN factorisation_norm = famat_Z_gcd(famat_mul(global_setup.gen_p_plus_fact, global_setup.gen_p_minus_fact),lideal_norm(H1_odd));
     GEN coeff = ideal_to_kernel_O0_T(H1_odd,factorisation_norm);
@@ -1029,8 +976,8 @@ void ideal_to_isogeny_two_2f_delta(two_walk_long *phi, GEN *L,
     phi_2.A = phi_1_next.A;
 
 
-    two_walk phi_2_adjusted;// = phi_2; // push kernel away from (0:1)
-    proj phi_2_adjusted_target; // = phi_2.A;
+    two_walk phi_2_adjusted; // push kernel away from (0:1)
+    proj phi_2_adjusted_target;
 
     pt = phi_2.ker;
     eval_walk_isom(&isom, &phi_2_adjusted, &phi_2_adjusted_target, &pt, &phi_2, &pt);
@@ -1076,12 +1023,8 @@ void ideal_to_isogeny_two_2f_delta(two_walk_long *phi, GEN *L,
     two_walk_long phi_2_dual_eta;
     init_trivial_two_walk_long(&phi_2_dual_eta);
 
-    // float accumulated_time = 0.;
-    // clock_t t;
-    // t = tic();
     if (dist > 0) {
         bool done;
-        //rand_isom(&isom, &to);
         assert(dist != 1); // for now, the case dist == 1 crashes
         done = MITM2(&eta, &from, &to, dist);
         assert(done);
@@ -1090,7 +1033,6 @@ void ideal_to_isogeny_two_2f_delta(two_walk_long *phi, GEN *L,
     else {
         two_walk_stol(&phi_2_dual_eta, &phi_2_dual);
     }
-    //TOC(t, "MITM");
 
 
 
@@ -1143,9 +1085,6 @@ void ideal_to_isogeny_two_2f_delta(two_walk_long *phi, GEN *L,
 
 
 
-    // float accumulated_time = 0.;
-    // clock_t t;
-    // t = tic();
 
     from = psi_1_source, from0 = psi_1_source;
     to = phi2_pushed_target; // phi_2 source
@@ -1159,7 +1098,6 @@ void ideal_to_isogeny_two_2f_delta(two_walk_long *phi, GEN *L,
     else {
         two_walk_stol(phi, &phi2_pushed_dual);
     }
-    //TOC(t, "MITM");
 
 
     two_walk_composition_sl(phi, &phi_1_next, phi);
@@ -1332,7 +1270,6 @@ void ideal_to_isogeny_O0_two_long(two_walk_long *phi, GEN *L, special_isogeny *p
     special_isogeny triv_special = trivial_special_isogeny();
     two_walk_long triv_two;
     init_trivial_two_walk_long(&triv_two);
-    //output(lideal_norm(I));
 
     ideal_to_isogeny_two(phi, L, phi_L, I, trivial_ideal, trivial_ideal, &triv_special, &triv_two,endpoint_close_to_E0);
     *L = gerepilecopy(ltop, *L);

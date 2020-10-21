@@ -276,7 +276,6 @@ GEN klpt_solve_beta_special(GEN A, GEN gamma, GEN delta, GEN N, GEN J) {
     } while (gcmp(zeta,gen_0) == 0);
 
     if (gcmp(zeta,gen_0) == 0) {
-        // printf("No beta found (special)\n");
         avma = ltop;
         return NULL;
     }
@@ -290,8 +289,6 @@ GEN klpt_solve_beta_special(GEN A, GEN gamma, GEN delta, GEN N, GEN J) {
 // Assumes the basis of A is 1, i, j, j*i, where i^2 = -1 and j^2 = -p
 GEN klpt_special_smooth_given_nearprime_J(GEN J0, GEN L0, GEN N, GEN fm) {
     pari_sp ltop = avma;
-    // clock_t t;
-    // float accumulated_time_ms = 0.;
 
     GEN A = lideal_algebra(J0);
     GEN order = lideal_order(J0);
@@ -327,7 +324,7 @@ GEN klpt_special_smooth_given_nearprime_J(GEN J0, GEN L0, GEN N, GEN fm) {
         GEN beta_norm = algnorm(A,beta,0);
 
         if (gcmp(ggcd(beta_norm, N),gen_1) != 0) {
-            // printf("Problem with beta!\n");
+            /// A problem with this beta!
             continue;
         }
 
@@ -340,21 +337,18 @@ GEN klpt_special_smooth_given_nearprime_J(GEN J0, GEN L0, GEN N, GEN fm) {
         GEN betap = NULL;
 
         do {
-            // t = tic();
             do {
                 fm_2 = famat_random(fm_rem, bound_L2);
                 L2 = famat_prod(fm_2);
                 L2_is_square = Fp_issquare(L2,N);
                 safety_ctr++;
             } while (((L2_is_square != beta_norm_is_square) || RgV_isin(list_L2, L2)) && (safety_ctr < 40));
-            //accumulated_time_ms += toc(t);
             if (safety_ctr >= 40) { continue; } // not enough entropy in fm_rem to ensure a solution
 
             list_L2 = vec_append(list_L2,L2);
 
             // strong approximation
             GEN lambda = Fp_sqrt(Fp_div(L2,beta_norm,N), N);
-            // if (!lambda) { continue; } // we already made sure this doesn't happen
 
             betap = klpt_strong_approximation(A, order, p, N, beta,gamma, L2, lambda);
 
@@ -365,7 +359,6 @@ GEN klpt_special_smooth_given_nearprime_J(GEN J0, GEN L0, GEN N, GEN fm) {
                 GEN alpha = algmul(A,gamma,betap);
                 GEN generator = algmul(A,lideal_generator_coprime(J0,norm),alg_conj(A,alpha));
                 GEN newideal = lideal_create(A, order, generator, norm);
-                //printf("acc\t [%f ms]\n",  (accumulated_time_ms));
 
                 return gerepilecopy(ltop, newideal);
             }
@@ -385,15 +378,9 @@ GEN klpt_special_smooth(GEN I, GEN fm) {
     // find an equivalent nearprime ideal
     GEN J0 = lideal_equiv_nearprime(I,fm,0);
 
-    // if (!J0) {
-    //     I = lideal_equiv_nearprime(I, mkmat2(mkcols(2),mkcols(256)), 0);
-    //     return klpt_special_smooth_small_2e_input(I, fm);
-    // }
-
     GEN fm_0 = famat_Z_gcd(fm, lideal_norm(J0));
     GEN L0 = famat_prod(fm_0);
     GEN N = diviiexact(lideal_norm(J0), L0);
-    // printf("\t %ld bits\n", (long)dbllog2r(itor(N,10)));
 
     GEN fm_without_L0 = famat_div(fm,fm_0);
 
@@ -418,7 +405,6 @@ GEN klpt_special_smooth(GEN I, GEN fm) {
 
 GEN klpt_special_smooth_given_2e_J(GEN J, GEN fm) {
     pari_sp ltop = avma;
-    //clock_t t;
 
     GEN A = lideal_algebra(J);
     GEN order = lideal_order(J);
@@ -506,7 +492,6 @@ GEN klpt_special_smooth_given_2e_J(GEN J, GEN fm) {
 
 GEN klpt_special_smooth_small_2e_input(GEN I, GEN fm){
     pari_sp ltop = avma;
-    //clock_t t;
 
     GEN A = lideal_algebra(I);
     GEN order = lideal_order(I);
@@ -537,7 +522,6 @@ GEN klpt_special_smooth_small_2e_input(GEN I, GEN fm){
 
 GEN klpt_general_power_given_J(GEN I, GEN l, GEN J, GEN delta) {
     pari_sp ltop = avma;
-    // clock_t t;
 
     GEN A = lideal_algebra(I);
     GEN order = lideal_order(I);
@@ -571,7 +555,6 @@ GEN klpt_general_power_given_J(GEN I, GEN l, GEN J, GEN delta) {
 
         if (!coeff) break;
 
-        //printf("log L1 = %ld\n", (long) dbllog2r(itor(L1,10)));
         gamma = gtrans(coeff); // norm N*L1
 
         // compute beta1 in span(j,j*i) such that gamma*beta in J with GCD(N(beta),N) = 1
@@ -597,13 +580,13 @@ GEN klpt_general_power_given_J(GEN I, GEN l, GEN J, GEN delta) {
 
     if (!beta1) {
         avma = ltop;
-        // printf("beta1 not found!\n");
+        // beta1 not found
         return NULL;
     }
 
 
     if (gcmp(ggcd(beta1_norm, N),gen_1) != 0) {
-        // printf("Problem with beta1!\n");
+        // Problem with beta1
         avma = ltop;
         return NULL;
     }
@@ -614,7 +597,7 @@ GEN klpt_general_power_given_J(GEN I, GEN l, GEN J, GEN delta) {
 
     if (!beta2) {
         avma = ltop;
-        // printf("beta2 not found!\n");
+        // beta2 not found
         return NULL;
     }
 
@@ -623,7 +606,7 @@ GEN klpt_general_power_given_J(GEN I, GEN l, GEN J, GEN delta) {
     int beta_norm_is_square_NI = Fp_issquare(beta2_norm,lideal_norm(I));
 
     if (gcmp(ggcd(beta2_norm, N),gen_1) != 0) {
-        // printf("Problem with beta2!\n");
+        // Problem with beta2
         avma = ltop;
         return NULL;
     }
@@ -700,31 +683,21 @@ GEN klpt_general_power_given_J_fixed_norm(GEN I, GEN l, GEN J, GEN delta) {
     GEN N;
     N = lideal_norm(J);
 
-    //int l_is_square_N = Fp_issquare(l,N);
-    //int l_is_square_NI = Fp_issquare(l,lideal_norm(I));
-
     // find a quaternion gamma in (1,i,j,ji) of norm N*L1 where L1 divides fm
     GEN p_div_N = gadd(truedivii(p, N), gen_1);
 
     long L1_exp = floor(dbllog2r(itor(p_div_N,10)) / dbllog2r(itor(l,10)) )+13;
     GEN L1 = powis(l, L1_exp);
-    // printf("L1 %ld\n", Z_lval(L1,2));
 
 
 
 
     GEN coeff, gamma, beta1, beta1_norm,beta2,beta2_norm,beta,beta_norm,mu;
 
-    // int beta_norm_is_square_N;
     unsigned int safety_ctr = 0;
 
     GEN NNI = gmul(N,lideal_norm(I));
-    //GEN bound_L2 = gmul(gmul(gmul(p,NNI),gmul(NNI,NNI)),stoi(80)); // (p*N^3)*MARGIN
 
-    // long L2_exp = floor(dbllog2r(itor(bound_L2,10)) / dbllog2r(itor(l,10)))+10;
-    // long L2_exp = signing_length - L1_exp + 4;
-    // GEN L2 = powis(l, L2_exp);
-    // printf("L2 %ld\n", Z_lval(L2,2));
     long L2_exp;
     GEN L2;
     do {
@@ -736,8 +709,6 @@ GEN klpt_general_power_given_J_fixed_norm(GEN I, GEN l, GEN J, GEN delta) {
       GEN X1;
       alglatcontains(A,order,gamma,&X1);
       GEN n1 =content(X1);
-      //GEN g1=ggcd(n1,L1);
-      // output(g1);
 
       //overestimate the size, so that after removing the constant factor, the lenght is exacltly signing_length
       L2_exp = signing_length - L1_exp + 4 + 2*Z_lval(ggcd(n1,L1),2);
@@ -747,13 +718,13 @@ GEN klpt_general_power_given_J_fixed_norm(GEN I, GEN l, GEN J, GEN delta) {
       beta1 = klpt_solve_beta(A, gamma, J, N);
       if (!beta1) {
           avma = ltop;
-          // printf("beta1 not found!\n");
+          // beta1 not found
           return NULL;
       }
       beta1_norm = algnorm(A,beta1,0);
 
       if (gcmp(ggcd(beta1_norm, N),gen_1) != 0) {
-          // printf("Problem with beta1!\n");
+          // Problem with beta1
           avma = ltop;
           return NULL;
       }
@@ -763,15 +734,14 @@ GEN klpt_general_power_given_J_fixed_norm(GEN I, GEN l, GEN J, GEN delta) {
       if (!beta2) {
           avma = ltop;
           return NULL;
-          // printf("beta2 not found!\n");
-        // break;
+          // beta2 not found
       }
 
       beta2_norm = algnorm(A,beta2,0);
 
 
       if (gcmp(ggcd(beta2_norm, N),gen_1) != 0) {
-          // printf("Problem with beta2!\n");
+          // Problem with beta2
           avma = ltop;
           return NULL;
       }
@@ -791,12 +761,10 @@ GEN klpt_general_power_given_J_fixed_norm(GEN I, GEN l, GEN J, GEN delta) {
         mu = klpt_strong_approximation(A, order, p, NNI, beta,gamma, L2, lambda);
       }
     } while ( !beta && !mu && (safety_ctr < 100));
-    // printf("number of attempts :%i \n",safety_ctr);
     if (!beta || !mu) {
         avma = ltop;
         return NULL;
-        // printf("beta2 not found!\n");
-      // break;
+        // beta2 not found
     }
 
     if (mu) {
@@ -805,136 +773,9 @@ GEN klpt_general_power_given_J_fixed_norm(GEN I, GEN l, GEN J, GEN delta) {
         GEN generatorJ = lideal_generator_coprime(J,l);
         GEN generator = algmul(A,generatorJ,alg_conj(A,alpha));
         GEN norm = gmul(L1,L2);
-        // printf("norm ? %ld\n", Z_lval(norm,2));
-        // N(alpha) = N*norm
         GEN newideal = lideal_create(A, order, generator, norm);
         return gerepilecopy(ltop, newideal);
     }
-
-
-    // do {
-    //     coeff = NULL;
-    //     while((!coeff) && safety_ctr < 16) {
-    //         L1 = gmul(L1, l);
-    //         safety_ctr++;
-    //         coeff = norm_equation_special(p, gmul(L1,N), 0, true);
-    //
-    //     }
-    //
-    //     if (!coeff) break;
-    //
-    //     //printf("log L1 = %ld\n", (long) dbllog2r(itor(L1,10)));
-    //     gamma = gtrans(coeff); // norm N*L1
-    //
-    //     // compute beta1 in span(j,j*i) such that gamma*beta in J with GCD(N(beta),N) = 1
-    //     beta1 = klpt_solve_beta(A, gamma, J, N);
-    //
-    //     // make sure that there exists an e such that l^e*norm(beta) is a quadratic residue mod N
-    //     if (beta1) {
-    //         beta1_norm = algnorm(A,beta1,0);
-    //         beta_norm_is_square_N = Fp_issquare(beta1_norm,N);
-    //
-    //         if (beta_norm_is_square_N) {
-    //             if (l_is_square_N) {}
-    //             else if (!l_is_square_N) parity = 0;
-    //         }
-    //         else if (!beta_norm_is_square_N) {
-    //             if (l_is_square_N) { beta1 = NULL; } // try again...
-    //             else if (!l_is_square_N) parity = 1;
-    //         }
-    //     }
-    // }
-    // // sometimes a gamma is found such that gamma*j is in J, in which case beta1 is not found... a few repetitions should avoid that
-    // while ((!beta1) && (safety_ctr < 16)); // max 16 because we do not want L1 to get too big
-    //
-    // if (!beta1) {
-    //     avma = ltop;
-    //     // printf("beta1 not found!\n");
-    //     return NULL;
-    // }
-    //
-    //
-    // if (gcmp(ggcd(beta1_norm, N),gen_1) != 0) {
-    //     // printf("Problem with beta1!\n");
-    //     avma = ltop;
-    //     return NULL;
-    // }
-    //
-    // // compute beta2 in span(j,j*i) such that gamma*beta*delta/N - zeta in I with GCD(zeta,N(I)) = 1
-    //
-    // GEN beta2 = klpt_solve_beta_special(A, gamma, delta, N, I);
-    //
-    // if (!beta2) {
-    //     avma = ltop;
-    //     // printf("beta2 not found!\n");
-    //     return NULL;
-    // }
-    //
-    // GEN beta2_norm = algnorm(A,beta2,0);
-    //
-    // int beta_norm_is_square_NI = Fp_issquare(beta2_norm,lideal_norm(I));
-    //
-    // if (gcmp(ggcd(beta2_norm, N),gen_1) != 0) {
-    //     // printf("Problem with beta2!\n");
-    //     avma = ltop;
-    //     return NULL;
-    // }
-    // // recover beta as a CRT combination of beta1 and beta2
-    // GEN C0 = Z_chinese(gel(beta1,3), gel(beta2,3), N, lideal_norm(I));
-    // GEN D0 = Z_chinese(gel(beta1,4), gel(beta2,4), N, lideal_norm(I));
-    //
-    // GEN beta = mkcol4(gen_0,gen_0,C0,D0);
-    //
-    // GEN NNI = gmul(N,lideal_norm(I));
-    // GEN bound_L2 = gmul(gmul(gmul(p,NNI),gmul(NNI,NNI)),stoi(80)); // (p*N^3)*MARGIN
-    //
-    // long L2_exp = floor(dbllog2r(itor(bound_L2,10)) / dbllog2r(itor(l,10)));
-    //
-    // GEN beta_norm = algnorm(A,beta,0);
-    //
-    // int fail = 0;
-    // if (beta_norm_is_square_NI) {
-    //     if (l_is_square_NI) {}
-    //     else if (!l_is_square_NI) {
-    //         if (parity == 1) { fail = 1; } // no way
-    //         else { parity = 0; }
-    //     }
-    // }
-    // else if (!beta_norm_is_square_NI) {
-    //     if (l_is_square_NI) { fail = 1; } // no way
-    //     else if (!l_is_square_NI) {
-    //         if (parity == 0) { fail = 1; } // no way
-    //         else { parity = 1; }
-    //     }
-    // }
-    //
-    // if (fail) {
-    //     avma = ltop;
-    //     return NULL;
-    // }
-    //
-    // if ((parity != -1) && ((L2_exp % 2) != parity)) L2_exp++;
-    //
-    // GEN L2 = powis(l, L2_exp);
-
-    // for (int j = 0; j < 10; j++) {
-    //     GEN lambda1 = Fp_sqrt(Fp_div(L2,beta_norm,N), N);
-    //     GEN lambda2 = Fp_sqrt(Fp_div(L2,beta_norm,lideal_norm(I)), lideal_norm(I));
-    //     GEN lambda = Z_chinese(lambda1, lambda2, N, lideal_norm(I));
-    //     GEN mu = klpt_strong_approximation(A, p, NNI, beta, L2, lambda);
-    //     if (mu) {
-    //         GEN alpha = algmul(A,gamma,mu);
-    //         GEN generatorJ = lideal_generator_coprime(J,l);
-    //         GEN generator = algmul(A,generatorJ,alg_conj(A,alpha));
-    //         GEN norm = gmul(L1,L2);
-    //         // N(alpha) = N*norm
-    //         GEN newideal = lideal_create(A, order, generator, norm);
-    //         return gerepilecopy(ltop, newideal);
-    //     }
-    //
-    //     L2 = gmul(L2,l);
-    //     if (parity != -1) L2 = gmul(L2,l);
-    // }
 
     return NULL;
 }
@@ -942,17 +783,13 @@ GEN klpt_general_power_given_J_fixed_norm(GEN I, GEN l, GEN J, GEN delta) {
 
 GEN klpt_general_power_small_J(GEN I, GEN K, GEN l, GEN list_previous_NJ, GEN* NJ) {
     pari_sp ltop = avma;
-    //clock_t t;
 
     // find prime ideal J equivalent to K
     // delta in K and K*conj(delta)/N(K) = J
     GEN delta, J;
 
-    //t = tic();
     J = lideal_equiv_prime_except(K,&delta,list_previous_NJ);
-    //TOC(t, "prime\t");
 
-    // printf("log NJ = %ld\n", (long) dbllog2r(itor(NJ,10)));
     GEN klpt_sol = klpt_general_power_given_J_fixed_norm(I, l, J, delta);
     if (NJ && klpt_sol) {
         *NJ = lideal_norm(J);
@@ -970,15 +807,12 @@ GEN klpt_general_power_small_J(GEN I, GEN K, GEN l, GEN list_previous_NJ, GEN* N
 
 GEN klpt_general_power_random_J(GEN I, GEN K, GEN l, GEN bound_coeff_J) {
     pari_sp ltop = avma;
-    //clock_t t;
 
     // find prime ideal equivalent to K
     // delta in K and K*conj(delta)/N(K) = J
     GEN delta, J;
 
-    //t = tic();
     J = lideal_equiv_prime_random(K,&delta,bound_coeff_J);
-    //TOC(t, "prime\t");
     if (!J) { avma = ltop; return NULL; }
 
     return klpt_general_power_given_J_fixed_norm(I, l, J, delta);

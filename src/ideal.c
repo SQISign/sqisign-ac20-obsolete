@@ -101,30 +101,19 @@ GEN lideal_create(GEN A, GEN order, GEN x, GEN N) {
 
     GEN lideal = cgetg(6,t_VEC);
 
-    //GEN lat_x = alglatmul(A, order, x);
-    //GEN lat_N;
     if (N) {
-        //lat_N = alglatmul(A, order, alg_scalar(A, norm));
-        //gel(lideal,1) = alglatadd(A, lat_x, lat_N, NULL);
         GEN n;
         GEN y = alg_primitive(&n, A, order, x);
         GEN g = ggcd(n, N);
         GEN h = ggcd(algnorm(A,y,0),gdiv(N,g));
 
         
-        // printf("Norms...\n");
-        // output(N);
-        // output(n);
-        // output(g);
-        
-        //assert(gcmp(g, gen_1) == 0);
         g = gen_1; // ONLY CREATE IDEALS THAT ARE NOT DIVISIBLE BY AN INTEGER
 
         gel(lideal,2) = gmul(h,gsqr(g));
         gel(lideal,3) = gmul(g,y);
     }
     else {
-        //gel(lideal,1) = lat_x;
         gel(lideal,2) = algnorm(A,x,0);
         gel(lideal,3) = gcopy(x);
     }
@@ -548,8 +537,7 @@ GEN lideal_equiv_nearprime(GEN lideal, GEN fm, unsigned int try_at_least) {
 
             M = diviiexact(M,N_odd);
 
-            // TODO: check M for small bad factors;
-            // if (ugcd(2552041111277906183ULL, umodiu(M,2552041111277906183ULL)) != 1) continue;
+            // TODO: check M for small bad factors
 
             if ((!fm) || (lg(fm) == 1)) M_reduced = M; // famat_Z_gcd does not handle the empty matrix properly?
             else {

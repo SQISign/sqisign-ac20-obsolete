@@ -146,17 +146,12 @@ bool xLIFT(fp2 *y, const proj *A, const proj *P) {
         return false;
     }
     else { // on the twist
-        // B = Fp2_inv(fp2_non_residue());
         fp2 tmp = fp2_non_residue();
         fp2_mul2(y, &tmp);
         fp2_sqrt(y);
         return true;
     }
 
-    // // test
-    // fp2_mul3(&tmp1,y,y);
-    // fp2_sub2(&tmp1,&y2);
-    // assert(fp2_iszero(&tmp1));
 }
 
 // Given x(P) and x(Q) both in A or both not in A, computes x(P±Q)
@@ -1301,13 +1296,7 @@ bool mont_two_DLP(uint64_t *a,const proj *A, const proj *Q, const proj *P,const 
 
   bool ok = mont_two_DLP_rec(a, A, e, stack_Q, stack_P,stack_PQ, 1);
 
-  // #ifndef NDEBUG
-  // uintbig big;
-  // uintbig_set(&big,*a);
-  // proj R;
-  // xMUL(&R, A, P, &big);
-  // assert(mont_equal(&R,Q));
-  // #endif
+
 
   return ok;
 }

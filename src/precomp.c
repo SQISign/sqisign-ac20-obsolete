@@ -214,9 +214,7 @@ bool fp2_ord_trivial(long *res, const fp2 *g, long bound) {
     long order = 1;
     fp2 x = *g;
 
-    //printf("ORDER\n");
     for (int i = 0; i < bound; ++i) {
-        //print_fp2(&x);
         if (fp2_equal(&fp2_1,&x)) { *res = order; return true; }
         order++;
         fp2_mul2(&x,g);
@@ -656,7 +654,6 @@ int main(int argc, char *argv[]){
     // ted0_twister_frob = B^((p-1)/2) where By^2 = x^3 + x is the quadratic twist of y^2 = x^3 + x
     // B is set to be Fp2_inv(fp2_non_residue) (see implementation of twisted edwards, notably xLIFT)
     fp2 ted0_twister_frob_ = fp2_non_residue();
-    // fp2_inv(&ted0_twister_frob_);
     uintbig p12;
     uintbig_set(&p12,1);
     uintbig_sub3(&p12, &p, &p12);
@@ -665,7 +662,6 @@ int main(int argc, char *argv[]){
 
     assert(fp2_equal(&ted0_twister_frob,&ted0_twister_frob_));
 
-    //printf("const fp2 ted0_twister_frob = %s;\n", fp2_code(&ted0_twister_frob_));
 
 
 

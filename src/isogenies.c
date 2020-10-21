@@ -26,19 +26,8 @@ void eval_rtl_old(proj *A, proj *Q, int n, isog_degree deg, const long* fact, lo
 void eval_rtl_rec(proj *A, proj *K, int len, bool advance,proj *P, int stacklen, long fact) {
 
   if (len==0) return;
-  // printf("len is %i \n",len);
-  // proj Test;
-  //
-  // uintbig fac_mult;
-  // uintbig_set(&fac_mult,fact);
-  // xMUL(&Test,A,K,&fac_mult);
-  // for (int i=1;i<len;i++)
-  //   xMUL(&Test,A,&Test,&fac_mult);
-  //
-  // assert(mont_iszero(&Test));
 
   if (len==1) {
-    // for (int i=0; i<stacklen; i++)
     xISOG_many(A, P, stacklen, K, fact);
 
   } else {
@@ -68,9 +57,6 @@ void eval_rtl_rec(proj *A, proj *K, int len, bool advance,proj *P, int stacklen,
 void eval_rtl(proj *A, proj *Q, int n, isog_degree deg, const long* fact, long len) {
   uintbig cof;
   degree_to_uint(&cof, deg, fact, len);
-  // proj Test;
-  // xMUL(&Test,A,Q+1,&cof);
-  // assert(mont_iszero(&Test));
 
   //starting by the 3^53 or 5^21 isogeny reduces the number of scalar multiplication
   int start=0;
@@ -93,7 +79,6 @@ void eval_rtl(proj *A, proj *Q, int n, isog_degree deg, const long* fact, long l
     for (int i=0; i<n;i++)
       stack[i]=*(Q+i);
     eval_rtl_rec(A, &K, v, false, stack, n, fact[0]);
-    // assert(mont_iszero(&stack[1]));
     for (int i=0;i<n;i++)
         *(Q+i)=(stack[i]);
 
@@ -194,7 +179,6 @@ void dual_one_side(proj *A, const proj *K, bool K_is_on_curve, isog_degree deg,
 
   while (true) {
     fp2_random(&res[0].x);
-    //randombytes(res[0].x.re.x.c + 0, 32);
     res[0].z = fp2_1;
     if (is_on_curve(res, A) != K_is_on_curve)
       continue;

@@ -326,10 +326,6 @@ long normalized_walk(two_walk *w,uint64_t *zip, long *n) {
     // as we would need some extra point (the difference between the kernel and the points of the basis ?)
     proj P1,P2,P3,dummy_A;
     find_basis(&P1,&P2,&P3,&w[index_w].A);
-    // Pc[0]=P1;
-    // Qc[0]=P2;
-    // PQc[0]=P3;
-    // Ac[0]=w[index_w].A;
     proj push_points[3];
     push_points[0]=P2;
     push_points[1]=P1;
@@ -344,7 +340,6 @@ long normalized_walk(two_walk *w,uint64_t *zip, long *n) {
     isomorphism isom;
     mont_isom(&isom,&w[index_w].A,&dummy_A);
     mont_isom_apply(&isom,&w[index_w].ker);
-    // w[index_w].A= dummy_A;
   }
 
   proj A = w[index_w].A;
@@ -359,10 +354,6 @@ long normalized_walk(two_walk *w,uint64_t *zip, long *n) {
     proj P1,P2,P3;
     proj dummy_A;
     find_basis(&P1,&P2,&P3,&A);
-    // Pc[index]=P1;
-    // Qc[index]=P2;
-    // PQc[index]=P3;
-    // Ac[index]=A;
     #ifndef NDEBUG
     proj test_order;
     test_order=P1;
@@ -402,7 +393,6 @@ long normalized_walk(two_walk *w,uint64_t *zip, long *n) {
       for (int i=1; i < w_step ;i++){
         loc_phi[i] = w[index_w+i];
       }
-      // remain_step+=w[index_w+1].len;
     }
     remain_step = two_tors_height - remain_step;
 
@@ -483,7 +473,6 @@ long normalized_walk(two_walk *w,uint64_t *zip, long *n) {
     proj proj_tmp = {fp2_1, fp2_0};
     proj j1,j2;
     jinv256(&j1,&A);
-    // eval_walk(&norm_walk[index],&A_target,&proj_tmp);;
     jinv256(&j2,&A_target);
     assert(mont_equal(&j1, &j2));
     #endif
@@ -498,7 +487,6 @@ long normalized_walk(two_walk *w,uint64_t *zip, long *n) {
     isomorphism isom;
 
     proj P1,P2,P3,A_target;
-    // eval_walk_isom(&isom,&norm_walk[step],&A_target,NULL,&norm_walk[step],NULL);
     find_basis(&P1,&P2,&P3,&A);
     two_walk phi_test;
     phi_test.A=A;
@@ -545,22 +533,15 @@ long normalized_walk(two_walk *w,uint64_t *zip, long *n) {
   two_walk walk[step+add_step];
   for (int i = 0; i < step; i++) {
     uintbig_set(&a, zip[i] );
-    // long hint = (zip[i] & hint_mask) >> two_tors_height;
     // get the next kernel
     find_basis(&P, &Q, &PQ, &A);  // TODO: use point Q from previous step + hint
 
-    // assert(mont_equal(&A,&Ac[i]));
-    // assert(mont_equal(&P,&Pc[i]));
-    // assert(mont_equal(&Q,&Qc[i]));
-    // assert(mont_equal(&PQ,&PQc[i]));
     xBIDIM(&(walk[i].ker), &A, &P, &a, &Q, &uintbig_1, &PQ);
-    // assert(mont_equal(&walk[i].ker,&w[i].ker));
     walk[i].A = A;
     walk[i].len = two_tors_height;
     // take the next step
     isomorphism isom;
     eval_walk_isom(&isom,&walk[i], &A, NULL,&walk[i],NULL);
-    // A=walk[i].A;
     proj j1,j2;
     jinv256(&j1,&A);
     jinv256(&j2,&w[i+1].A);
@@ -576,8 +557,6 @@ long normalized_walk(two_walk *w,uint64_t *zip, long *n) {
 
 void challenge(proj *E_cha, const uintbig *m, const proj *E_com, const proj *basis_plus, const proj *basis_minus, GEN *dlog, proj *basis_two){
     pari_sp ltop = avma;
-    //unsigned short newseed[3] = {1,2,3};
-    //unsigned short *oldptr = seed48(newseed);
 
     odd_isogeny phi;
     proj A = *E_com;
@@ -619,7 +598,6 @@ void challenge(proj *E_cha, const uintbig *m, const proj *E_com, const proj *bas
 
     // find the 'plus' part of the kernel
     while (1) {
-        //fp2_random(&P->x); fp2_random(&P->z);
         fp_add2(&H.x.re, &fp_1);
         if (!is_on_curve(&H, E_com)) continue;
         xMUL(&P, E_com, &H, &cofactor_plus);
@@ -669,7 +647,6 @@ void challenge(proj *E_cha, const uintbig *m, const proj *E_com, const proj *bas
             }
         }
 
-        //dlog_plus = torsion_crt_compose(mkvec2(coeff_1, coeff_2), false);
         dlog_plus = mkvec2(coeff_1, coeff_2);
 
         GEN dlog_plus_composed = torsion_crt_compose(dlog_plus, false);
@@ -730,7 +707,6 @@ void challenge(proj *E_cha, const uintbig *m, const proj *E_com, const proj *bas
     // find the 'minus' part of the kernel
     while (1) {
         fp_add2(&H.x.re, &fp_1);
-        //fp2_random(&P->x); fp2_random(&P->z);
         if (is_on_curve(&H, &A)) continue;
         xMUL(&P, &A, &H, &cofactor_minus);
         xMUL(&P, &A, &P, &p_minus_odd_cofactor);
@@ -783,7 +759,6 @@ void challenge(proj *E_cha, const uintbig *m, const proj *E_com, const proj *bas
         }
 
 
-        //dlog_minus = torsion_crt_compose(mkvec2(coeff_1, coeff_2), true);
 
         dlog_minus = mkvec2(coeff_1, coeff_2);
 
@@ -841,20 +816,17 @@ void decompress(two_walk *walk, proj *A, const uint64_t *zip, long len,long last
     // get the next kernel
     find_basis(&P, &Q, &PQ, A);  // TODO: use point Q from previous step + hint
     xBIDIM(&(walk[i].ker), A, &P, &a, &Q, &uintbig_1, &PQ);
-    // printf(" k %ld ",walk[i].ker.x.re.x.c[0]);
     walk[i].A = *A;
     walk[i].len = two_tors_height;
     // take the next step
     isomorphism isom;
     eval_walk_isom(&isom,&walk[i], A, NULL,&walk[i],NULL);
-    // printf("\n");
   }
   //last step of smaller size
   uintbig_set(&a, zip[len-1]);
   long hint = (zip[len-1] & hint_mask) >> two_tors_height;
   // get the next kernel
   find_basis(&P, &Q, &PQ, A);
-  // printf(" A %ld \n",A->x.re.x.c[0]);
   for (int i=0; i < two_tors_height - last_step ; i++){
     xDBL(&P,A,&P);
     xDBL(&Q,A,&Q);
@@ -865,7 +837,6 @@ void decompress(two_walk *walk, proj *A, const uint64_t *zip, long len,long last
   walk[len-1].len = last_step;
   isomorphism isom;
   eval_walk_isom(&isom,&walk[len-1],A,NULL,&walk[len-1], NULL);
-  // printf(" A %ld \n",A->x.re.x.c[0]);
 }
 
 // basis_two is the image of the basis of the two torsion through phi_com and phi_cha
@@ -894,12 +865,10 @@ void response(two_walk_long *sigma,uint64_t *zip,  GEN coeff_ker_challenge_commi
     GEN n;
     do{
         J = klpt_general_power(I, K, gen_2); // J inter I is equivalent to I_phipsi
-        // printf("path length %ld\n", Z_lval(lideal_norm(J),2));
         alg_primitive(&n, A, order, algmul(A, lideal_generator(J), lideal_generator(I_two)));
 
         // backtracking?
     } while(gcmp(n,gen_1) != 0);
-    // printf("path length %ld\n", Z_lval(lideal_norm(J),2));
 
     // STEP 3: compute L of norm n(J) such that L inter sk->I_T is equivalent to I_phipsi
 
@@ -970,8 +939,6 @@ void response(two_walk_long *sigma,uint64_t *zip,  GEN coeff_ker_challenge_commi
     two_walk_composition_sl(sigma, &phi_tail, sigma);
 
     normalized_walk(sigma->phi,zip,&(sigma->len));
-    // sigma->len = normalized_n;
-    // assert(mont_equal(&sigma->phi[0].A)    //
 
     avma = ltop;
 }
@@ -1000,20 +967,10 @@ bool simple_check_signature(const two_walk_long *sigma, const uint64_t *zip, con
     long last_step= sigma->phi[sigma->len-1].len;
     decompress(check,&A_target,zip,(sigma->len),last_step);
     jinv256(&j3, &A_target);
-    // printf("%ld %ld \n",j2.x.re.x.c[0],j2.x.re.x.c[1]);
     return (mont_equal(&j1, &j2) && mont_equal(&j1,&j3));
 }
 
-// void zip_copy(compressed_signature *comp_sigma,uint64_t *zip, long len) {
-//   compressed_signature res;
-//   res.E_com=comp_sigma->E_com;
-//   res.zip=malloc(sizeof(uint64_t)*len);
-//   for (int i=0;i <len;i++){
-//     res.zip[i]=zip[i];
-//   }
-//   free(comp_sigma->zip);
-//   // comp_sigma->E_com = { fp2_0, fp2_1 };
-//   *comp_sigma= res;
+
 
 
 void sign(compressed_signature *comp_sigma, const secret_key *sk, const public_key *pk, const uintbig *m) {
@@ -1023,7 +980,6 @@ void sign(compressed_signature *comp_sigma, const secret_key *sk, const public_k
     odd_isogeny phi_com;
     proj E_cha;
 
-    //printf("Commitment\n");
 
     commitment(&coeff_com, &I_com, &phi_com);
 
@@ -1075,9 +1031,6 @@ void sign(compressed_signature *comp_sigma, const secret_key *sk, const public_k
         }
     }
 
-    //printf("Challenge\n");
-
-    // comp_sigma->E_com= Sigma->E_com;
 
     GEN dlog;
 
@@ -1114,13 +1067,7 @@ void sign(compressed_signature *comp_sigma, const secret_key *sk, const public_k
 
     response(&sigma, comp_sigma->zip, coeff_ker_challenge_commitment, sk, basis_two, &E_cha);
 
-    // Sigma->sigma = sigma;
-    // zip_copy(comp_sigma,zip,signing_length_two_tors_height_step);
 
-
-    // for (int i=0;i<signing_length_two_tors_height_step ;i ++ ){
-    //     comp_sigma->zip[i]=zip[i];
-    // }
 
 
     assert(simple_check_signature(&sigma,comp_sigma->zip, pk, &E_cha));
@@ -1139,19 +1086,14 @@ bool verif(compressed_signature *comp_sigma, const public_key *pk,const uintbig 
     challenge(&A_chall, m, &A_chall, NULL, NULL, NULL, NULL);
     proj A_check=pk->E;
     two_walk walk_check[signing_length_two_tors_height_step];
-    // for (int i=0;i< 30;i++){
-    //   printf("%ld ",comp_sigma->zip[i]);
-    // }
-    // printf("\n");
+
 
     decompress(walk_check,&A_check,comp_sigma->zip,signing_length_two_tors_height_step,last_step_length);
 
     proj j1,j2;
     jinv256(&j1,&A_chall);
     normalize_proj(&j1);
-    // printf("%ld %ld \n",j1.x.re.x.c[0],j1.x.re.x.c[1]);
     jinv256(&j2,&A_check);
     normalize_proj(&j2);
-    // printf("%ld %ld \n",j2.x.re.x.c[0],j2.x.re.x.c[1]);
     return mont_equal(&j1,&j2);
 }

@@ -272,7 +272,6 @@ static long build_list_rec(proj *A, long lenA, long len, proj **stack_1, proj **
     long right = (double)len * 0.5;
     long left = len - right;
     for (int j = 0; j < lenA; ++j) {
-      // printf("2) j %d\n", j);
       stack_1[j][stacklen] = stack_1[j][stacklen-1];
       stack_2[j][stacklen] = stack_2[j][stacklen-1];
       stack_3[j][stacklen] = stack_3[j][stacklen-1];
@@ -309,14 +308,12 @@ static void build_list(long length, const proj *from, proj *A, const proj *P1, c
   A[0] = *from;
 
   long lenA = (1ull<<length);
-  //printf("init lenA %ld\n", lenA);
   proj *stack_1[lenA], *stack_2[lenA], *stack_3[lenA];
 
   long log, len = length;
   for (log = 0; len > 1; len >>= 1) log++;
   log += 1;
 
-  //printf("init log %ld\n", log);
   for (int i = 0; i < lenA; ++i) {
     // TODO: this is too much
     stack_1[i] = malloc(sizeof(proj)*log);
@@ -525,7 +522,6 @@ bool MITM2(two_walk *eta, const proj *from, const proj *to, long length) {
 
       eta->len = length;
       eta->A = *from;
-      //eval_dual(&theta, &head_curve, &eta->ker);
 
       free(h_tab);
       return true;

@@ -2,6 +2,7 @@
 #define CONSTANTS_H
 
 #include "uintbig.h"
+#include <assert.h>
 
 extern const long class_mod_4;
 extern const long two_tors_height;
@@ -37,5 +38,27 @@ extern const long p_plus_mult_com[];
 // the multiplicities to take to obtain log2(p)/2 bits of torsion (for challenge)
 extern const long p_minus_mult_cha[];
 extern const long p_plus_mult_cha[];
+
+// inverse mapping of p_plus_fact and p_minus_fact
+// Warning: unsafe if ell is not in the factors!
+static inline long ell_to_index(long ell, bool *twist) {
+  *twist = false;
+  for (const long *f = p_plus_fact; *f <= ell; f++)
+    if (*f == ell)
+      return f - p_plus_fact;
+  *twist = true;
+  for (const long *f = p_minus_fact; *f <= ell; f++)
+    if (*f == ell)
+      return f - p_minus_fact;
+  assert(0);
+  return(0);
+}
+static inline long ell_to_e(long ell) {
+  if (ell == 2)
+    return two_tors_height;
+  bool twist;
+  int index = ell_to_index(ell, &twist);
+  return (twist ? p_minus_mult : p_plus_mult)[index];
+}
 
 #endif

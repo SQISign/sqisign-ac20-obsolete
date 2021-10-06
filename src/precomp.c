@@ -16,6 +16,7 @@
 #include "mont.h"
 #include "tedwards.h"
 #include "constants.h"
+#include "precomputed.h"
 
 #define FP_LIMBS (4 * 64 / GMP_LIMB_BITS)
 
@@ -31,28 +32,16 @@ const fp2 ted0_twister_frob = { { 7694077626149142205ULL, 2250429401854817681ULL
   { 14451885770804936219ULL, 10930435212066601406ULL, 15495326356676002808ULL, 5880257503665917138ULL } };
 
 
-struct quaternion_setup_t {
-    GEN p; // the prime
-    GEN B; // the quaternion algebra
-    GEN qf; // the quaternion algebra
-    GEN O0; // the cannonical maximal order
-    GEN one;
-    GEN i;
-    GEN j;
-    GEN ji;
-    GEN torsion_fm; // factorisation matrix of the available torsion
 
-    GEN O0_b1;
-    GEN O0_b2;
-    GEN O0_b3;
-    GEN O0_b4;
-    GEN O0_to_standard;
-    GEN standard_to_O0;
+proj torsion_basis[12][3];
+proj torsion_basis_sum[3];
+point torsion_basis_ted_sum[3];
+proj torsion_basis_twist[19][3];
+proj torsion_basis_twist_sum[3];
+point torsion_basis_twist_ted_sum[3];
+proj torsion_basis_two[3];
 
-    proj E0;
-};
-
-struct quaternion_setup_t global_setup;
+struct precomp_struct global_setup;
 
 
 

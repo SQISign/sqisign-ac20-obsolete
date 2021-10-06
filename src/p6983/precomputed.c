@@ -484,6 +484,7 @@ proj torsion_basis_twist_sum[3];
 point torsion_basis_twist_ted_sum[3];
 proj torsion_basis_two[3];
 
+struct precomp_struct global_setup;
 
 
 /*
@@ -745,52 +746,3 @@ void init_precomputations() {
 
 }
 
-
-long ell_to_index(long ell, bool *twist) {
-	switch (ell) {
-		case 3: *twist = true; return 0;
-		case 43: *twist = true; return 1;
-		case 103: *twist = true; return 2;
-		case 109: *twist = true; return 3;
-		case 199: *twist = true; return 4;
-		case 227: *twist = true; return 5;
-		case 419: *twist = true; return 6;
-		case 491: *twist = true; return 7;
-		case 569: *twist = true; return 8;
-		case 631: *twist = true; return 9;
-		case 677: *twist = true; return 10;
-		case 857: *twist = true; return 11;
-		case 859: *twist = true; return 12;
-		case 883: *twist = true; return 13;
-		case 1019: *twist = true; return 14;
-		case 1171: *twist = true; return 15;
-		case 1879: *twist = true; return 16;
-		case 2713: *twist = true; return 17;
-		case 4283: *twist = true; return 18;
-		case 5: *twist = false; return 0;
-		case 7: *twist = false; return 1;
-		case 11: *twist = false; return 2;
-		case 31: *twist = false; return 3;
-		case 83: *twist = false; return 4;
-		case 107: *twist = false; return 5;
-		case 137: *twist = false; return 6;
-		case 751: *twist = false; return 7;
-		case 827: *twist = false; return 8;
-		case 3691: *twist = false; return 9;
-		case 4019: *twist = false; return 10;
-		case 6983: *twist = false; return 11;
-	}
-	assert(0);
-	return 0;
-}
-
-long ell_to_e(long ell) {
-	switch (ell) {
-		case 3: return 53;
-		case 103: return 2;
-		case 5: return 21;
-		case 7: return 2;
-		case 2: return 33;
-		default: return 1;
-	}
-}

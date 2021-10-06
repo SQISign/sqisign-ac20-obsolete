@@ -52,8 +52,8 @@ $(TESTS_GMP): build/test_%_gmp: test/%.c $(LIB_GMP)
 # Additional executables
 EXES=build/precomp
 
-build/precomp: src/precomp.c $(LIB_GMP)
-	$(CC) $< $(LIB_GMP) $(CFLAGS) $(DEBUG_FLAGS) $(CFLAGSLINK) -lgmp -o $@
+build/precomp: src/precomp.c $(filter-out %/precomputed.o,$(LIB_GMP))
+	$(CC) $^ $(CFLAGS) $(DEBUG_FLAGS) $(CFLAGSLINK) -lgmp -o $@
 
 # Velusqrt Tuning
 

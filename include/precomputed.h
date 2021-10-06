@@ -29,7 +29,7 @@ struct precomp_struct {
     GEN i;
     GEN j;
     GEN ji;
-    // GEN torsion_fm; // factorisation matrix of the available torsion
+    GEN torsion_fm; // factorisation matrix of the available torsion
 
     GEN O0_b1; // 1
     GEN O0_b2; // i
@@ -54,7 +54,7 @@ struct precomp_struct {
 };
 
 
-struct precomp_struct global_setup;
+extern struct precomp_struct global_setup;
 
 void init_precomputations();
 

@@ -18,28 +18,7 @@
 #include "mont.h"
 #include "tedwards.h"
 #include "constants.h"
-
-struct quaternion_setup_t {
-    GEN p; // the prime
-    GEN B; // the quaternion algebra
-    GEN qf; // the quaternion algebra
-    GEN O0; // the cannonical maximal order
-    GEN one;
-    GEN i;
-    GEN j;
-    GEN ji;
-    GEN torsion_fm; // factorisation matrix of the available torsion
-
-    GEN O0_b1;
-    GEN O0_b2;
-    GEN O0_b3;
-    GEN O0_b4;
-    GEN O0_to_standard;
-    GEN standard_to_O0;
-};
-
-struct quaternion_setup_t global_setup;
-
+#include "precomputed.h"
 
 GEN norm0(GEN x) {
     return algnorm(global_setup.B, x,0);

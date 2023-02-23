@@ -1,6 +1,8 @@
 # SQISign: compact post-quantum signatures from quaternions and isogenies
 
-This code implements the isogeny-based signature scheme SQISign.
+This code implements the original version of the isogeny-based signature scheme SQISign. For details see this [paper](https://eprint.iacr.org/2020/1240).
+
+An updated and optimized version can be found [here](https://github.com/SQISign/sqisign-ec23).
 
 (C) 2020, The SQISign team. MIT license.
 
